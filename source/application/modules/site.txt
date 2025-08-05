@@ -1,0 +1,966 @@
+<?php defined('BASEPATH') OR exit('No direct script access allowed');
+
+class Site extends Base_Controller 
+{
+    public function __construct()
+    {
+        parent::__construct();  
+        // date_default_timezone_set("Asia/Kolkata"); 
+        // ini_set('memory_limit', '1024M');
+        // ini_set('max_execution_time', 2000);
+        // $value = base_url();
+        // setcookie("mcadc",$value, time()+3600*24,'/');
+        $this->load->model('common_model');
+        $this->load->model('site_model');
+        $this->load->model('student/student_model');
+        // $this->load->model('order/order_model');
+        // $this->load->library('imageupload');
+        // $this->load->helper('create_captcha');
+        // $this->load->library('email_sent');
+        $this->load->library('cart');
+    }
+    public function index()
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $data['slider_data'] = $this->common_model->fetch_visible_data('tbl_slider_master','slider_master_id');
+        $data['members_data'] = $this->common_model->fetchDataASC_In_use('tbl_home_page_commitee','home_page_commitee_id');
+        $data['clients_data'] = $this->common_model->fetchDataASC_In_use('tbl_our_client','our_client_id');
+        $data['gr_data'] = $this->common_model->fetchDataASClimit('tbl_gr_master','gr_master_id',10);
+        $data['news_data']= $this->common_model->fetch_visible_data('tbl_news_master','news_id');
+        $data['keydata'] = $this->common_model->selectDetailsWhr('tbl_rest_keys','id',1);
+        $this->load->view('index',$data);
+    }
+
+    public function committee()
+    {   
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $data['committee_data']=$this->common_model->fetchDataASC('tbl_committee','committee_id');
+        $this->load->view('committee-members',$data);
+    }
+    public function gallery()
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $data['gallery_data']=$this->common_model->fetchDataDESC('tbl_gallery_master','gallery_master_id');
+        $this->load->view('gallery',$data);
+    }
+    public function my_profile()
+    { 
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $institute_code = $this->session->userdata('institute_code');
+        if(!isset($institute_code) && empty($institute_code))
+        {
+            redirect('');
+        }
+        $id = $this->session->userdata('institute_id');
+        $data['user_data']=$this->site_model->institute_details($id);
+        $this->load->view('my-profile',$data);
+    }
+    public function edit_profile()
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $data['district_data'] = $this->common_model->fetchDataASC_In_use('tbl_district','district_id');
+        $data['keydata'] = $this->common_model->selectDetailsWhr('tbl_rest_keys','id',1);
+        $id = $this->session->userdata('institute_id');
+        $data['user_data']=$this->site_model->institute_details($id);
+        $this->load->view('edit-profile',$data);
+    }
+    public function my_profilesidebar($id)
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $this->load->view('my-profilesidebar');
+    }
+    public function change_password()
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $data['keydata'] = $this->common_model->selectDetailsWhr('tbl_rest_keys','id',1);
+        $this->load->view('change-password',$data);
+    }
+    public function renewal_form($id=false)
+    {
+        $id = $this->session->userdata('institute_id');
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $data['keydata'] = $this->common_model->selectDetailsWhr('tbl_rest_keys','id',1);
+        $data['insti_data'] = $this->common_model->selectDetailsWhr('tbl_renewal','institute_id',$id);
+        $this->load->view('renewal-form',$data);
+    }
+
+    public function suchna()
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $data['gr_data'] = $this->common_model->fetchDataDESC_In_use('tbl_gr_master','gr_master_id');
+        $this->load->view('suchna',$data);
+    }
+    public function sign_up()
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $data['keydata'] = $this->common_model->selectDetailsWhr('tbl_rest_keys','id',1);
+         $data['district_data'] = $this->common_model->fetchDataASC_In_use('tbl_district','district_id');
+        $this->load->view('sign-up',$data);
+    }
+
+    public function forgot_password()
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $this->load->view('forgot-password',$data);
+    }
+    public function new_renewal_form($id=false)
+    {
+        $id = $this->session->userdata('institute_id');
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $data['keydata'] = $this->common_model->selectDetailsWhr('tbl_rest_keys','id',1);
+        $data['insti_data'] = $this->common_model->selectDetailsWhr('tbl_inspection','institute_id',$id);
+        $this->load->view('new-renewal-form',$data);
+    }
+    public function print_renewal_new_form()
+    {
+        $id = $this->session->userdata('institute_id');
+        $data['form_data'] = $this->common_model->selectDetailsWhr('tbl_inspection','institute_id',$id);
+        $html = $this->load->view('site/print_renewal_new_pdf', $data, true);  
+        $pdfFilePath = $data['form_data']->inst_name.'_Renewal_new_Form.pdf';
+        $this->m_pdf->pdf->WriteHTML($html);
+        // $this->m_pdf->pdf->Output();
+        $this->m_pdf->pdf->Output($pdfFilePath, "D");   
+    }
+    public function student_registration()
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $data['keydata'] = $this->common_model->selectDetailsWhr('tbl_rest_keys','id',1);
+        $data['district_data']=$this->common_model->fetchDataASC_In_use('tbl_district','district_id');
+        $data['course_master_data']=$this->common_model->fetchDataASC('tbl_course_master','course_master_id');
+        // echo $this->db->last_query();
+        $this->load->view('student-registration',$data);
+    }
+
+    public function edit_student($id)
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $id = $this->encryptdecryptstring->decrypt_string($id);
+        $data['keydata'] = $this->common_model->selectDetailsWhr('tbl_rest_keys','id',1);        
+        $data['student_data'] = $this->common_model->selectDetailsWhr('tbl_student','student_id',$id);
+        $data['district_data']=$this->common_model->fetchDataASC_In_use('tbl_district','district_id');
+        $data['course_master_data']=$this->common_model->fetchDataASC('tbl_course_master','course_master_id');
+        // echo $this->db->last_query();
+        $this->load->view('student-registration',$data);
+    }
+    public function faq()
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $data['faq_topic_data']=$this->common_model->fetchDataASC_In_use('tbl_faq_topics','faq_topic_id');
+        $this->load->view('faq-que',$data);
+    }
+    public function sabhasad()
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $data['district_data']=$this->common_model->fetchDataDesc('tbl_district','district_id');
+        $this->load->view('sabhasad',$data);
+    }
+    public function sabhasad_list($id)
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $data['district_data_list'] =$this->common_model->selectMultiDataFor('view_institute','district_id','institute_status',$id,'Active');
+        $data['district']=$this->common_model->selectDetailsWhr("tbl_district","district_id",$id); 
+        $this->load->view('sabhasad-list',$data);
+    }
+    public function contact_us()
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $data['keydata'] = $this->common_model->selectDetailsWhr('tbl_rest_keys','id',1);
+        $this->load->view('contact-us',$data);
+    }
+    public function student_result()
+    {   
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $this->load->view('student-result',$data);
+    }
+
+    public function fetch_result()
+    {
+       $seat_no = $this->input->post('seat_no');
+       $exam_password = $this->input->post('exam_password');
+       $data['resultData'] = $this->site_model->fetch_result($seat_no,$exam_password);
+       // echo $this->db->last_query(); die;
+       $this->load->view('result_view',$data);
+    }
+
+    public function download_student_result($id)
+    {
+        $data['student_data']=$this->common_model->selectDetailsWhr('view_student','student_id',$id);
+        $pdfname=$data['student_data']->first_name.' '.$data['student_data']->surname;
+        $html=$this->load->view('download_result_pdf',$data,TRUE);
+        $this->report_creation->create_pdf_portrait($html,$pdfname);
+    }
+
+    public function view_student_result($user_id)
+    {
+        $data['stud_data']=$this->common_model->selectDetailsWhr('view_student','student_id',$user_id);
+        $data['stud_details']=$this->student_model->selectDetailsStud('tbl_student_result','student_id',$user_id);
+        $email_que  = $data['stud_details']->email_id;
+        $data['email_data']=$this->common_model->selectDetailsWhr('tbl_email_section','email_section_id',$email_que);
+        $speed_que  = $data['stud_details']->speed_id;
+        $data['speed_data']=$this->common_model->selectDetailsWhr('tbl_speed_passage','speed_passage_id',$speed_que);
+        $data['question_data']=$this->student_model->fetch_objective($user_id);
+        $this->load->view("view-stud-result",$data);
+    }
+
+    public function print_all_student_result()
+    {
+       $inst_id = $this->session->userdata('institute_id');
+       $data['stud_data']=$this->site_model->print_student_result($inst_id);
+       $data['stud_data_ssd']=$this->site_model->print_student_result_ssd($inst_id);
+       $pdfname='Student Result List';
+       $html=$this->load->view('download_all_result_pdf1',$data,TRUE);
+       $this->report_creation->create_pdf_portrait($html,$pdfname);
+    }
+
+    public function download_link()
+    {   
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $data['download_data'] = $this->common_model->fetch_visible_data('tbl_download_link_master','download_link_master_id');
+        $this->load->view('download-link',$data);
+    }
+    public function fees()
+    {   
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $institute_id = $this->session->userdata('institute_id');
+        $data['latest_batch_data']=$this->custom_model->get_latest_batch();
+        $batch_id = $data['latest_batch_data']->batch_id;
+        $data['batch_fees_data']=$this->common_model->selectDetailsWhr('tbl_batch_fees','batch_id',$batch_id);
+        $data['inst_data']=$this->common_model->selectDetailsWhr('view_institute','institute_id',$institute_id);  
+        $student_data=$this->custom_model->getappearstudentcount($institute_id,$batch_id);
+        $data['stud_count'] = $student_data;
+        $data['payment_adjusted'] = $this->site_model->payment_adjusted_stud($institute_id);
+        $this->load->view('fees',$data);
+    }
+    public function pariksharthi()
+    {   
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $this->load->view('pariksharthi',$data);
+    }
+    public function institute_stud_list()
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $institute_id = $this->session->userdata('institute_id');
+        $latest_batch_data=$this->custom_model->get_latest_batch();
+        $batch_id = $latest_batch_data->batch_id;
+        $data['batch_fees_data']=$this->common_model->selectDetailsWhr('tbl_batch_fees','batch_id',$batch_id); 
+        $data['student_data']=$this->common_model->selectMultiDataFor('tbl_student','institute_id','batch_id',$institute_id,$batch_id);
+        $p_cnt=0;
+        if(isset($data['student_data']) && !empty($data['student_data']))
+        {
+            foreach ($data['student_data'] as $key) {
+                if($key->student_status=='appear')
+                {
+                    $p_cnt = $p_cnt+1;
+                }
+            }
+        }
+        $data['p_cnt'] = $p_cnt;
+        // echo $this->db->last_query(); 
+        $data['inst_data']=$this->common_model->selectDetailsWhr('view_institute','institute_id',$institute_id);  
+        $this->load->view('institute-stud-list',$data);
+    }
+    public function track_courier()
+    {
+        $id = $this->session->userdata('institute_id');
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName']; 
+        $data['last_id']= $this->site_model->lastinsert('tbl_batch','batch_id');
+        $last_id = $data['last_id']->batch_id - 1 ;
+        $data['batch_data']=$this->common_model->selectDetailsWhr('tbl_batch','batch_id',$last_id);
+        $data['inst_data']=$this->common_model->selectDetailsWhr('tbl_institute','institute_id',$id);
+        // echo $last_id;
+        $this->load->view('track-courier',$data);
+    }
+    public function upload_institute_onwer_image()
+    {
+        if($_FILES['file']['name'] != '')
+        {
+            $test =explode(".", $_FILES['file']['name']);
+            $extension = end($test);
+            $name = rand(100000, 999999) . '.' . $extension;
+            $location = './uploads/inst_owner_photos/'.$name;
+            move_uploaded_file($_FILES['file']['tmp_name'], $location);
+            $img_path = base_url().'uploads/inst_owner_photos/'.$name;
+            $img =  '<img src="'.$img_path.'" style="height: 130px; width: 200px;" class="img-thumbnail"/>';
+            echo $img;
+        }
+    }
+
+    public function site_logout()
+    {
+        $this->authentication->site_logout();
+        redirect('');
+    }
+    public function news_details($id)
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $data['news_data']=$this->common_model->selectDetailsWhr('tbl_news_master','news_id',$id);
+        $this->load->view('news-details',$data);
+    }
+    public function suchna_details($id)
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $data['gr_master_data']=$this->common_model->selectDetailsWhr('tbl_gr_master','gr_master_id',$id);
+        $this->load->view('suchna-details',$data);
+    }
+    public function msceia_bonafide()
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $data['batch_data'] = $this->common_model->fetchDataASC_In_use('tbl_batch','batch_id');
+        $this->load->view('msceia-bonafide',$data);
+    }
+    public function dump_stud_data_batchwise()
+    {      
+        $batch_id=$this->input->post('id');
+        $id = $this->session->userdata('institute_id');
+        $data['stud_data'] = $this->common_model->selectMultiDataFor('view_student','institute_id','batch_id',$id,$batch_id);
+        // echo $this->db->last_query(); die;
+        $view = $this->load->view('batch-wise-stud-list',$data,true);
+        $this->json->jsonReturn(array(
+            'valid'=>true,
+            'view'=>$view
+        ));
+    }
+    public function print_msceia_bonafide($id)
+    {
+        $this->load->library('pdf/M_pdf');
+        $inst_id=$this->session->userdata('inst_id');
+        $data['form_data']=$this->common_model->selectDetailsWhr('view_student','student_id',$id);
+        $html=$this->load->view('site/print_msceia_bonafide', $data, true);
+        $pdfFilePath = $data['form_data']->stud_full_name.'_bonafide.pdf';
+        $this->m_pdf->pdf->WriteHTML($html);
+        $this->m_pdf->pdf->Output();
+        // $this->m_pdf->pdf->Output($pdfFilePath, "D");   
+    }
+    public function terms_condition()
+    {
+        $this->load->view('terms-condition');
+    }
+    public function print_renewal_form()
+    {
+        $this->load->library('pdf/m_pdf');
+        $institute_id=$this->session->userdata('institute_id');
+        $data['form_data']=$this->common_model->selectDetailsWhr('tbl_renewal','institute_id',$institute_id);
+        $html=$this->load->view('site/renewal_pdf', $data, true);
+        $pdfFilePath ='Renewal_Form.pdf';
+        $this->m_pdf->pdf->WriteHTML($html);
+        //$this->m_pdf->pdf->Output();
+        $this->m_pdf->pdf->Output($pdfFilePath, "D");       
+    }
+    
+    public function old_student_list()
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $data['last_id']= $this->site_model->lastinsert('tbl_batch','batch_id');
+        $last_id = $data['last_id']->batch_id;
+        $data['batch_data'] = $this->site_model->fetch_batch_data($last_id);
+        $this->load->view('old-student-list',$data);
+    }
+
+    public function upload_student_image()
+    {
+        if($_FILES['file']['name'] != '')
+        {
+            $test =explode(".", $_FILES['file']['name']);
+            $extension = end($test);
+            $n=27;
+            $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'; 
+            $randomString = ''; 
+            for ($i = 0; $i < $n; $i++) { 
+                $index = rand(0, strlen($characters) - 1); 
+                $randomString .= $characters[$index]; 
+            } 
+            $name = $randomString . '.' . $extension;
+            $location = './uploads/student_photos/'.$name;
+            move_uploaded_file($_FILES['file']['tmp_name'], $location);
+            $img_path = base_url().'uploads/student_photos/'.$name;
+            $img =  '<img src="'.$img_path.'" style="height: 150px; width: 200px;" class="img-thumbnail"/>';
+            echo $img;
+        }
+    }
+
+    public function add_stud_payment()
+    {
+        $id=$this->input->post('checkbox');
+        $id_count=count($id);
+        for($i=0;$i<$id_count;$i++)
+        {
+            $data[]=array('student_id'=>$id[$i],'student_status'=>'appear');
+            $result=$this->common_model->update_batch('tbl_student',$data,'student_id');
+        }
+
+        $this->json->jsonReturn(array(
+            'state'=>true,
+            'msg'=>'Student Added for Payment!',
+            'redirect'=>'fees'
+        ));
+    }
+
+    public function save_online_pay()
+    {    
+        $institute_id=$this->session->userdata('institute_id');
+        $mobile=$this->session->userdata('mobile');
+        $email=$this->session->userdata('email');
+        $inst_name=$this->input->post('inst_name');
+        $inst_code=$this->input->post('inst_code');
+        $cash_depositer_name=$this->input->post('cash_depositer_name');
+        $stud_count=$this->input->post('stud_count');
+        $paid_amount=$this->input->post('paid_amount');
+        $deposite_date=$this->input->post('deposite_date');
+        if(isset($deposite_date) && !empty($deposite_date))
+        {
+          $deposite_date=date('Y-m-d',strtotime($deposite_date));
+        }
+        else
+        {
+          $deposite_date='';
+        }
+        $payment_mode=$this->input->post('payment_mode');
+        $transaction_id=$this->generateRandomString();
+        $order_data = array('institute_id'=>$institute_id,'institute_name'=>$inst_name, 'institute_code'=>$inst_code,'mobile'=>$mobile,'email'=>$email,'depositer_name'=>$cash_depositer_name,'total_student'=>$stud_count,'total_amount'=>$paid_amount,'deposite_date'=>$deposite_date,'payment_mode'=>$payment_mode,'transaction_no'=>$transaction_id, 'status'=>"Pending", "display"=>"Y","payment_status"=>"payment_success");
+        $payment_id = $this->common_model->addData("tbl_payment", $order_data); 
+        if(isset($payment_id) && !empty($payment_id)) {
+            $order_data['payment_id'] = $payment_id;
+            $this->session->set_userdata('order_data',$order_data);
+            $this->session->set_userdata('institute_id',$institute_id);
+            $this->load->library('Payumoney_lib');
+            $this->payumoney_lib->onlinePayment($inst_name,$order_data);
+        }
+        else {
+            echo "<center><h3>Your order status is FAILED.</h3></center>";
+            echo "<center><h4>Your transaction id for this transaction is ".$transaction_id.". You may try again by clicking <a href='".base_url()."fees'>here</a>.</h4></center>";
+            echo "<a></a>";
+        }   
+    }
+
+    public function save_adjusted_online_pay()
+    {    
+        $institute_id=$this->session->userdata('institute_id');
+        $mobile=$this->session->userdata('mobile');
+        $email=$this->session->userdata('email');
+        $inst_name=$this->input->post('inst_name');
+        $inst_code=$this->input->post('inst_code');
+        $cash_depositer_name=$this->input->post('cash_depositer_name');
+        $stud_count=$this->input->post('stud_count');
+        $paid_amount=$this->input->post('paid_amount');
+        $deposite_date=$this->input->post('deposite_date');
+        if(isset($deposite_date) && !empty($deposite_date))
+        {
+          $deposite_date=date('Y-m-d',strtotime($deposite_date));
+        }
+        else
+        {
+          $deposite_date='';
+        }
+        $payment_mode=$this->input->post('payment_mode');
+        $transaction_id=$this->generateRandomString();
+        $order_data = array('institute_id'=>$institute_id,'institute_name'=>$inst_name, 'institute_code'=>$inst_code,'mobile'=>$mobile,'email'=>$email,'depositer_name'=>$cash_depositer_name,'total_student'=>$stud_count,'total_amount'=>$paid_amount,'deposite_date'=>$deposite_date,'payment_mode'=>$payment_mode,'transaction_no'=>$transaction_id, 'status'=>"Pending", "display"=>"Y","payment_status"=>"payment_success");
+        $payment_id = $this->common_model->addData("tbl_payment", $order_data);
+        $adjust_data = array('display' => 'N');
+        $this->site_model->updateDetailsWithConditions('tbl_payment', 'institute_id',$institute_id,'depositer_name',"msceiateam",  $adjust_data); 
+        if(isset($payment_id) && !empty($payment_id)) {
+            $order_data['payment_id'] = $payment_id;
+            $this->session->set_userdata('order_data',$order_data);
+            $this->session->set_userdata('institute_id',$institute_id);
+            $this->load->library('Payumoney_lib');
+            $this->payumoney_lib->onlinePayment($inst_name,$order_data);
+        }
+        else {
+            echo "<center><h3>Your order status is FAILED.</h3></center>";
+            echo "<center><h4>Your transaction id for this transaction is ".$transaction_id.". You may try again by clicking <a href='".base_url()."fees'>here</a>.</h4></center>";
+            echo "<a></a>";
+        }   
+    }
+
+    public function generateRandomString()
+    {   
+        $day=date ("d");
+        $month=date ("m");
+        $year=date ("Y");
+        $time=time();
+        $dmyt=$day+$month+$year+$time;    
+        $random = rand(0,10000000);  
+        $dmtran= $dmyt+$random;
+        $unique=  uniqid();
+        $dmtun = $dmtran.$unique;
+        $mdun = strtoupper(md5($dmtran.$dmtun));
+        $uniqueString = substr($mdun, 5, -15); // getting 12 character length code.
+        return $uniqueString;
+    }
+
+    public function order_success()
+    {
+        $status = $_POST["status"];
+        $firstname = $_POST["firstname"];
+        $amount = $_POST["amount"];
+        $txnid = $_POST["txnid"];
+        $posted_hash = $_POST["hash"];
+        $key = $_POST["key"];
+        $productinfo = $_POST["productinfo"];
+        $email = $_POST["email"];
+        $udf1 = $_POST['udf1'];
+        $udf2 = $_POST['udf2'];
+        $institute_data = $this->common_model->selectDetailsWhr("tbl_institute", "institute_id", $udf2);
+        $username = $institute_data->institute_code;
+        $password = $institute_data->institute_password;
+        $roleId = $institute_data->role_id;
+        $this->authentication->login($username,$password,$roleId);
+        // $salt = "kQutChXjLZ";
+        $salt="dG1v6G373V";
+
+        $retHashSeq = $salt . '|' . $status . '|||||||||' . $udf2 . '|' . $udf1 . '|' . $email . '|' . $firstname . '|' . $productinfo . '|' . $amount . '|' . $txnid . '|' . $key;
+        $hash = hash("sha512", $retHashSeq);
+
+        if ($hash != $posted_hash) {
+            // echo "Invalid Transaction. Please try again";
+            $this->load->view('order_failure_without_hash');
+        } else {
+            $returnData = $this->input->post();
+            if (isset($returnData) && !empty($returnData) && $returnData['status'] == 'success') {
+                $user_id = $returnData['udf2'];
+                $payment_id = $returnData['udf1'];
+                $this->common_model->updateDetails("tbl_payment", "payment_id", $payment_id, array('status' => $returnData['status']));
+                $order_data = $this->common_model->selectDetailsWhr("tbl_payment", "payment_id", $payment_id);
+                if (isset($order_data) && !empty($order_data)) {
+                    $order_data = (array) $order_data;
+                    unset($order_data['payment_id']);
+                    unset($order_data['status']);
+                    unset($order_data['modified_by']);
+                    unset($order_data['modified_on']);
+                    unset($order_data['display']);
+                } else {
+                    $order_data = $this->session->userdata('order_data');
+                }
+                //      $user_id=$this->session->userdata('institute_id');
+                $latest_batch_data=$this->custom_model->get_latest_batch();
+                $batch_id = $latest_batch_data->batch_id;
+                $stud_data = $this->custom_model->select_latest_batch_apper_student($user_id,$batch_id);
+                foreach ($stud_data as $key) {
+                    $stud[] = array('student_id' => $key->student_id, 'student_status' => 'payment', 'payment_id'=>$payment_id);
+                }
+                $this->db->trans_start();
+                $order_data['created_on'] = date('Y-m-d H:i:s');
+                // $fee_id = $this->common_model->addData('tbl_fees_details', $order_data);
+                foreach ($stud_data as $key) {
+                    $stud = array('student_status' => 'payment', 'payment_id'=>$payment_id);
+                    $this->common_model->updateDetails('tbl_student', 'student_id', $key->student_id, $stud);
+                    $stud = array();
+                }
+                $cnt = count($stud);
+                for ($i = 0; $i < $cnt; $i++) {
+                    $this->common_model->updateDetails('tbl_student', 'student_id', $stud[$i]['student_id'], $stud);
+                }
+                $ins_data = array('download_status' => 'Active');
+                $institute_id = $user_id;
+                $this->common_model->updateDetails('tbl_institute', 'institute_id', $institute_id, $ins_data);
+                $inst_data = $this->common_model->selectDetailsWhr('tbl_institute', 'institute_id', $institute_id);
+                $mob_msg = 'Demo Exam software link now activated, kindly download from msceia.in website. For any support call to MSCEIA team.';
+                sendSms($inst_data->institute_contact, $mob_msg);
+                $result = $this->db->trans_complete();
+                $id = $this->encryptdecryptstring->encrypt_string($payment_id);
+                redirect(base_url() . "confirm/" . $id);
+            } else {
+                if (isset($returnData) && !empty($returnData)) {
+                    $payment_id = $returnData['udf1'];
+                    $this->common_model->updateDetails("tbl_payment", "payment_id", $payment_id, array('status' => 'Failed'));
+                }
+                $this->order_failure();
+            }
+        }
+    }
+
+    public function order_failure()
+    {
+        $status = $_POST["status"];
+        $firstname = $_POST["firstname"];
+        $amount = $_POST["amount"];
+        $txnid = $_POST["txnid"];
+        $posted_hash = $_POST["hash"];
+        $key = $_POST["key"];
+        $productinfo = $_POST["productinfo"];
+        $email = $_POST["email"];
+        $udf1 = $_POST['udf1'];
+        $udf2 = $_POST['udf2'];
+        $institute_data = $this->common_model->selectDetailsWhr("tbl_institute", "institute_id", $udf2);
+        $username = $institute_data->institute_code;
+        $password = $institute_data->institute_password;
+        $roleId = $institute_data->role_id;
+        $this->authentication->login($username,$password,$roleId);
+        // $salt = "kQutChXjLZ";
+        $salt="dG1v6G373V";
+        $retHashSeq = $salt . '|' . $status . '|||||||||||' . $email . '|' . $firstname . '|' . $productinfo . '|' . $amount . '|' . $txnid . '|' . $key;
+        $hash = hash("sha512", $retHashSeq);
+        if ($hash != $posted_hash) {
+            // echo "<center><br><br><br><br>";
+            // echo "Invalid Transaction. Please try again";
+            // echo "<br><br>";
+            // echo "Invalid Transaction. Please try again";
+            // echo "</center>";
+            $this->load->view('order_failure');
+        } else {
+            $data['status'] = $status;
+            $data['txnid'] = $txnid;
+            $this->load->view('order_failure_with_hash',$data);
+            // echo "<center><h3>Your order status is " . $status . ".</h3></center>";
+            // echo "<center><h4>Your transaction id for this transaction is " . $txnid . ". You may try again by clicking <a href='" . base_url() . "fees'>here</a>.</h4></center>";
+            // echo "<a></a>";
+        }
+    }
+
+    public function confirm($payment_id)
+    {
+        $id = $this->encryptdecryptstring->decrypt_string($payment_id);
+        $data['fees'] = $this->common_model->selectDetailsWhr('tbl_payment', 'payment_id', $id);
+        $this->load->view('confirm',$data);
+    }
+
+    public function print_payment_receipt($payment_id)
+    {
+        $id = $this->encryptdecryptstring->decrypt_string($payment_id);
+        $data['payment_data'] = $this->common_model->selectDetailsWhr('tbl_payment', 'payment_id', $id);
+        $data['student_data'] = $this->common_model->selectAllWhr('view_student','payment_id',$id);
+        $pdfname='Appeared Student';
+        // $this->load->view('site/print_payment_receipt', $data);
+        $html=$this->load->view('site/print_payment_receipt', $data, TRUE);
+        $this->report_creation->create_pdf($html,$pdfname);
+    }
+
+    public function student_registration_excel()
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $data['keydata'] = $this->common_model->selectDetailsWhr('tbl_rest_keys','id',1);
+        $this->load->view('student-registration-using-excel',$data);
+    }
+    public function upload_stud_excel()
+    {
+        if($_FILES['file']['name'] != '')
+        {
+            $test =explode(".", $_FILES['file']['name']);
+            $extension = end($test);
+            $name = rand(100000000, 999999999) . '.' . $extension;
+            $location = './uploads/stud_reg_excel/'.$name;
+            move_uploaded_file($_FILES['file']['tmp_name'], $location);
+            $file_path = base_url().'uploads/stud_reg_excel/'.$name;
+            echo $name;
+        }
+    }
+
+    public function appeared_students()
+    {
+       $inst_id = $this->session->userdata('institute_id');
+       $data['stud_data']=$this->common_model->selectMultiDataFor('view_student','institute_id','student_status',$inst_id,'payment');
+       $pdfname='Appeared Students';
+       $html=$this->load->view('site/appeared_students', $data, TRUE);
+       $this->report_creation->create_pdf($html,$pdfname);
+    }
+
+    public function check_password()
+    {
+        // print_r($_POST); die;
+        $user_id=$this->session->userdata('institute_id');
+        $password=trim($this->input->post('password'));
+        $download_id=$this->input->post('download_id');
+        $download_data = $this->common_model->selectDetailsWhr('tbl_download_link_master','download_link_master_id',$download_id);
+        $download_details = $this->site_model->check_exam_download_details($user_id);
+        // print_r($download_data); die;
+        $data['userData'] = $this->common_model->selectDetailsWhr('tbl_institute','institute_id',$user_id);
+        $inst_password=$data['userData']->institute_password;
+        $download_status=$data['userData']->download_status;
+        $db_status=$data['userData']->db_status;
+        if($inst_password==$password)
+        {
+            if($download_data->download_link_master_id==1)
+            {
+                if($download_status=='Active')
+                {
+                    if($download_data->download_link_master_id==1)
+                    {
+                        if($db_status=='pending')
+                        {
+                           $data = array('db_status' => 'download');
+                           $result = $this->common_model->updateDetails('tbl_institute','institute_id', $user_id, $data);
+                        }
+                        $link=$download_data->download_link;
+                    }
+                    else
+                    {
+                        $link=$download_data->download_link;
+                    }
+                    $this->json->jsonReturn(array(
+                        'valid' => TRUE,
+                        'msg' => '<strong>Please Wait.. </strong>Software Downloaded Shortly..!',
+                        'redirect'=>$link
+                    ));
+                }
+                else
+                {
+                    $this->json->jsonReturn(array(
+                        'valid'=>FALSE,
+                        'msg'=>'<strong>Please Wait.. </strong> Elearn Practice Software Link Will Get Activate Soon...'
+                    ));
+                }
+            }
+            elseif($download_data->download_link_master_id==2)
+            {
+                if($download_status=='Active' && isset($download_details) && !empty($download_details))
+                {
+                    if($download_data->download_link_master_id==2)
+                    {
+                        if($db_status!='exam install' && $db_status!='upload')
+                        {
+                           $data = array('db_status' => 'exam download');
+                           $result = $this->common_model->updateDetails('tbl_institute','institute_id', $user_id, $data);
+                        }
+                        $link=$download_data->download_link;
+                    }
+                    else
+                    {
+                        $link=$download_data->download_link;
+                    }
+                    $this->json->jsonReturn(array(
+                        'valid' => TRUE,
+                        'msg' => '<strong>Please Wait.. </strong>Software Downloaded Shortly..!',
+                        'redirect'=>$link
+                    ));
+                }
+                else
+                {
+                    $this->json->jsonReturn(array(
+                        'valid'=>FALSE,
+                        'msg'=>'<strong>Please Wait.. </strong> Pay Your Student Fees First...'
+                    ));
+                }
+            }
+            else
+            {
+                $link=$download_data->download_link;
+                $this->json->jsonReturn(array(
+                    'valid' => TRUE,
+                    'msg' => '<strong>Please Wait.. </strong> Software Downloaded Shortly..!',
+                    'redirect'=>$link
+                ));
+            }
+        }
+        else
+        {
+            $this->json->jsonReturn(array(
+                'valid'=>FALSE,
+                'msg'=>'<strong>Error!</strong> You Enter Wrong Current Password!'
+            ));         
+        } 
+    }
+
+    public function hallticket()
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $institute_id = $this->session->userdata('institute_id');
+        $latest_batch_data=$this->custom_model->get_latest_batch();
+        $batch_id = $latest_batch_data->batch_id;
+        $data['batch_fees_data']=$this->common_model->selectDetailsWhr('tbl_batch_fees','batch_id',$batch_id);
+        $data['student_data']=$this->custom_model->getpaymentstudentcount($institute_id,$batch_id);
+        // echo $this->db->last_query();
+        $this->load->view('hallticket',$data);
+    }
+
+    public function hallticket_all($limit)
+    {
+        $limit=$this->uri->segment(2);
+        $id=$this->session->userdata('institute_id');
+        $ins_name=$this->session->userdata('institute_name');
+        $data['latest_batch_data']=$this->custom_model->get_latest_batch();
+        $batch_id = $data['latest_batch_data']->batch_id;
+        $data['student_data']=$this->custom_model->hallticket_all($id,$limit);
+        $this->load->library('pdf/M_pdf');
+        // $pdfname=$ins_name.' '.$limit.'pdf'; 
+        //$this->load->view('site/hallticket_pdf_all',$data);
+        $html=$this->load->view('hallticket_pdf_all',$data,TRUE);
+        // $this->report_creation->create_pdf($html,$pdfname);
+        $pdfFilePath = $ins_name.' '.$limit.'_hallticket.pdf';
+        $this->m_pdf->pdf->WriteHTML($html);
+        $this->m_pdf->pdf->Output();
+        // $this->m_pdf->pdf->Output($pdfFilePath, "D"); 
+    }
+
+    public function hallticket_student($id)
+    {        
+        $id = $this->encryptdecryptstring->decrypt_string($id);
+        $data['latest_batch_data']=$this->custom_model->get_latest_batch();
+        $data['student_data']=$this->common_model->selectDetailsWhr('view_student','student_id',$id);
+        $this->load->library('pdf/M_pdf');
+        // $pdfname=$data['student_data']->stud_name.' '.$data['student_data']->stud_last_name; 
+        //$this->load->view('site/hallticket_pdf',$data);
+        $html=$this->load->view('hallticket_pdf',$data,TRUE);
+        // $this->report_creation->create_pdf($html,$pdfname);
+        $pdfFilePath = $data['student_data']->first_name.' '.$data['student_data']->surname.'_hallticket.pdf';
+        $this->m_pdf->pdf->WriteHTML($html);
+        $this->m_pdf->pdf->Output();
+        // $this->m_pdf->pdf->Output($pdfFilePath, "D");   
+    }
+
+    public function download_attendance()
+    {
+        $id= $this->session->userdata('institute_id');
+        $data['attendance_data']=$this->common_model->selectMultiDataFor('view_student','institute_id','    student_status',$id,'payment');
+        // echo $this->db->last_query(); die;
+        $pdfname='Attendance List';
+        $html=$this->load->view('attendance_pdf',$data,TRUE);
+        $this->report_creation->create_pdf($html,$pdfname);
+    }
+
+    public function duplicate() 
+    {
+        $id=$this->input->post('id');
+        $p_key=$this->input->post('p_key');
+        $tbl=$this->input->post('tbl');
+        $where=$this->input->post('where');     
+        $value=$this->input->post('value');
+        $result=$this->common_model->duplicate($id,$p_key,$tbl,$where,$value);
+        // echo $this->db->last_query(); die;
+        if($result->numrows>0)
+        {
+            $this->json->jsonReturn(array(
+                'valid'=>true,
+                'msg'=>'<strong>"'. $value.'" </strong> Record Already Exist !'
+            ));
+        }
+        else
+        {
+            $this->json->jsonReturn(array(
+                'valid'=>False
+            ));
+        }
+    }
+
+    public function save_forgot_pass_site()
+    {
+        $email=$this->input->post('institute_mail'); 
+        $password=mt_rand(100000,999999);
+
+        $userData = $this->common_model->selectDetailsWhr('tbl_institute','institute_mail',$email);
+        if(isset($userData) && !empty($userData))
+        {   
+            $institute_id=$userData->institute_id;
+            $user_data=array('institute_password'=>$password);
+            $result=$this->site_model->forgot_pass_site($user_data,$password,$institute_id,$email);
+            if($result)
+            {
+                $this->json->jsonReturn(array(
+                  'state'=>TRUE,
+                  'msg'=>'New Password Send To Your Register Email Id!'
+                ));
+            }
+            else
+            {
+                $this->json->jsonReturn(array(
+                  'state'=>FALSE,
+                  'msg'=>'Error! While Password Sending On Email id!'
+                ));
+            }
+        }
+        else
+        {
+            $this->json->jsonReturn(array(
+              'state'=>FALSE,
+              'msg'=>'Error! You Enter Wrong Register Email id!'
+            ));     
+        } 
+    }
+
+    public function upload_status()
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+        $institute_id=$this->uri->segment(2);
+        $data['upload_status']=$this->common_model->selectDetailsWhr('view_institute','institute_code',$institute_id);  
+        $this->load->view('upload_status',$data);
+    }
+
+    public function upload_student_pdf()
+    {
+        $id=$this->uri->segment(2);
+        $data['inst_data']=$this->common_model->selectDetailsWhr('tbl_institute','institute_id',$id);
+        $data['stud_data']=$this->site_model->student_status_data($id);
+        $pdfname='Exam status';
+        $view=$this->load->view('exam_status',$data,TRUE);
+        $this->report_creation->create_pdf($view,$pdfname);
+    }
+
+    public function payment_history()
+    {
+        $data['logo'] = $this->config->load('app-config', TRUE)['AppLogo'];
+        $data['favicon'] = $this->config->load('app-config', TRUE)['favicon'];
+        $data['appname'] = $this->config->load('app-config', TRUE)['AppName'];
+    	$this->load->view('payment_history',$data);
+    }
+
+    public function print_payment_history($id)
+    {
+        $id =$this->uri->segment(2);
+        $pay_id = $this->encryptdecryptstring->decrypt_string($id);
+        $this->load->library('pdf/M_pdf');
+        $data['payment_history']=$this->site_model->payment_history_details($pay_id);
+        $pdfname='Payment Receipt';
+        $html=$this->load->view('print_payment_history',$data,TRUE);
+        $this->report_creation->create_pdf($html,$pdfname);
+    }
+}

@@ -1,0 +1,1 @@
+Dear parent your account has been generated on mes-notice application. Login id: <?php if(isset($user_define_name)){echo $user_define_name; } ?> & Password: <?php if(isset($password)){echo $password;} ?> of your account.

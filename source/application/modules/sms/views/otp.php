@@ -1,0 +1,1 @@
+<?php if(isset($otp)){echo ($otp); ?> is the OTP for your mobile verification on <?php if(isset($org_short_name)){echo $org_short_name; }else{"MES EBSM";}?> Admission Portal.<?php } ?>

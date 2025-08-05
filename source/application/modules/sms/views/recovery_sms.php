@@ -1,0 +1,1 @@
+The password for your <?php if(isset($display_year)) {echo $display_year; } ?> account was recently changed. Your current password is <?php if(isset($password)) {echo $password; } ?>.

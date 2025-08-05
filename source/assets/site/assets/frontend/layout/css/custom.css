@@ -1,0 +1,80 @@
+/* here you can put your own css to customize and override the theme */
+.mt-2{
+	margin-top: 20px;
+}
+.mt-1{
+	margin-top: 10px;
+}
+
+.font-red-mint {
+    color: #e43a45 !important;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.page-spinner-bar > div {
+    background: #2270bc !important;
+}
+
+.stud_name{
+	margin: 4px 0px 0px 10px !important;
+	position: absolute !important;
+	font-weight: 600 !important;
+}
+.label-complete {
+    background-color: #26c281;
+}
+.label-packed {
+    background-color: #8877a9;
+}
+.label-in-transit {
+    background-color: #ff5722;
+}
+.label-delivered {
+    background-color: #3598DC;
+}
+.label-dispatch {
+    background-color: #e87e04;
+}
+.label-pending {
+    background-color: #ed6b75;
+}
+.label-cancelled {
+    background-color: #d91e18;
+}
+.label-accepted {
+    background-color: #1ba39c;
+}
+.custom_span{
+    font-weight: 700; 
+    font-size: 14px;
+}
+.upload_title{
+    font-family: none !important;
+    color: red;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+    margin: 0 5px 0px !important;
+    border-bottom: 1px solid #eee;
+    padding: 1% 0% 3% 0%;
+}
+.account_details_portlet{
+    background: #fff;
+    padding: 20px;
+}
+.upload_receipt_portlet{
+    background: #fff;
+    padding: 20px;
+    margin-top: 5%;
+} 
+.form .form-actions {
+    background-color: #fff;
+}
+.padding-no{
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.text-left{
+    text-align: left;
+}

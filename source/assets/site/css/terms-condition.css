@@ -1,0 +1,13 @@
+ul.heading {
+              list-style-type:disc;
+            }
+            li #subline{
+                    font-size: 17px;
+                    /*font-family:'Open Sans', Arial, sans-serif;*/
+                    text-align: justify;
+            }
+            p{
+                font-size: 17px;
+                    font-family:  'Open Sans', Arial, sans-serif
+                    text-align: justify;
+            }

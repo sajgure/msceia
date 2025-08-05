@@ -1,0 +1,3 @@
+<?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+
+$config['keys']=array("role_id","section_id","speed_passage_id","user_id","email_section_id","faq_id","faq_topic_id","gallery_master_id","gr_master_id","question_id","option_id","committee_id","creative_gallery_id","district_id","menu_id","category_id","product_id","slider_id","query_id","submenu_id","slider_master_id","student_id","batch_id","institute_id","course_master_id","home_page_commitee_id","inspection_id","our_client_id","renewal_id","scroll_data_id","album_id","contact_id","download_link_master_id","batch_fees_id","fees_exemption_id","institute_activity_id","current_batch_id","shipping_label_master_id","news_id"); 

@@ -1,0 +1,1 @@
+Your application form No. <?php if(isset($form_no)) {echo $form_no; } ?> for camp event has been submitted successfully!

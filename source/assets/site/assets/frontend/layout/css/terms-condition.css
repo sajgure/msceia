@@ -1,0 +1,19 @@
+.heading {
+
+              list-style-type:disc;
+              
+}
+.subline{
+
+        font-size: 17px;
+        text-align: justify;
+}
+p{
+    font-size: 17px;
+    font-family:  'Open Sans', Arial, sans-serif
+    text-align: justify;
+}
+h2{
+    text-decoration: underline;
+
+ }
